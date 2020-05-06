@@ -41,8 +41,17 @@
       </div>
     </header>
     <div id="videos">
-      <video id="localVideo" muted autoplay playsinline></video>
-      <video id="remoteVideo" autoplay playsinline></video>
+      <canvas id="localCanvasCropped"></canvas>
+      <canvas id="localCanvas"></canvas>
+      <video
+        id="localVideo"
+        muted
+        autoplay
+        playsinline
+        width="0"
+        height="0"
+      ></video>
+      <video id="remoteVideo" autoplay playsinline width="0" height="0"></video>
     </div>
     <script src="./bundle.js"></script>
   </body>

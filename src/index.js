@@ -1,10 +1,18 @@
-import { initialiseEngine, animate, addAvatar } from "./webGL"
-import { initializeFirebase, createRoom, joinRoomById, hangUp } from "./webRTC"
+import { initialiseThreeJS, animate, addAvatar } from "./webGL"
+import {
+  initializeFirebase,
+  createRoom,
+  openWebcam,
+  joinRoomById,
+  hangUp,
+} from "./webRTC"
+import { initialiseFaceTracking, getFaceVideoFeed } from "./faceTracking"
 
-// initialiseEngine()
+// initialiseThreeJS()
+// initializeFirebase()
+initialiseFaceTracking()
+
 // animate()
-
-initializeFirebase()
 
 if (window.location.search) {
   const urlParams = new URLSearchParams(window.location.search)
@@ -13,7 +21,7 @@ if (window.location.search) {
   joinRoomById(id)
 }
 
-const createBubble = () => {
+const createBubble = async () => {
   const createBubbleButton = document.querySelector("#createBubbleButton")
   if (createBubbleButton.textContent === "highlight_off") {
     console.log("Hang up")
@@ -22,7 +30,10 @@ const createBubble = () => {
   } else {
     console.log("createBubble")
     createBubbleButton.textContent = "highlight_off"
-    createRoom()
+    // createRoom()
+    // await openWebcam()
+    await getFaceVideoFeed()
+    // addAvatar()
   }
 }
 

@@ -151,18 +151,38 @@ export const joinRoomById = async (roomId) => {
   }
 }
 
-const openWebcam = () => {
+const draw = (video, canvas, context) => {
+  context.drawImage(video, 0, 0, canvas.width, canvas.height)
+  setTimeout(draw, 20, video, canvas, context)
+}
+
+export const openWebcam = () => {
   return new Promise(async (resolve, reject) => {
     const stream = await navigator.mediaDevices.getUserMedia({
       video: true,
       audio: true,
     })
-    document.querySelector("#localVideo").srcObject = stream
+    const localVideo = document.querySelector("#localVideo")
+    localVideo.srcObject = stream
+
     localStream = stream
     remoteStream = new MediaStream()
-    document.querySelector("#remoteVideo").srcObject = remoteStream
 
-    console.log("Stream:", document.querySelector("#localVideo").srcObject)
+    const remoteVideo = document.querySelector("#remoteVideo")
+    remoteVideo.srcObject = remoteStream
+
+    const localCanvas = document.querySelector("#localCanvas")
+    const context = localCanvas.getContext("2d")
+
+    localCanvas.width = 640 //stream.videoWidth
+    localCanvas.height = 480 //stream.videoHeight
+
+    localVideo.addEventListener(
+      "play",
+      () => draw(localVideo, localCanvas, context),
+      false
+    )
+
     resolve()
   })
 }
