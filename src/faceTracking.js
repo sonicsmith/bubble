@@ -10,17 +10,7 @@ const isFaceDetectionModelLoaded = () => {
   return !!faceapi.nets.tinyFaceDetector.params
 }
 
-export const getFaceTracking = (input) => {
-  // const input = document.getElementById("localCanvas")
-
-  if (input.paused || input.ended || !isFaceDetectionModelLoaded()) {
-    console.log("Face tracking not ready")
-    return
-  }
-
-  return faceapi.detectSingleFace(input, new faceapi.TinyFaceDetectorOptions())
-}
-
+// This is the position of the face
 let faceBox = {
   x: 0,
   y: 0,
@@ -28,35 +18,47 @@ let faceBox = {
   height: 100,
 }
 
-const startFaceTracking = (input) => {
+// This is the position of the current crop
+let cropBox
+
+const getFaceTracking = (input) => {
   if (input.paused || input.ended || !isFaceDetectionModelLoaded()) {
     console.log("Face tracking not ready")
-    startFaceTracking(input)
+    getFaceTracking(input)
   }
-  console.log("Face tracking ready")
   faceapi
     .detectSingleFace(input, new faceapi.TinyFaceDetectorOptions())
     .run()
     .then((res) => {
-      console.log(res)
       if (res) {
         faceBox = res.box
       }
-      startFaceTracking(input)
+      getFaceTracking(input)
     })
 }
 
 const draw = (video, canvas, context, canvasFaceCrop) => {
   context.drawImage(video, 0, 0, canvas.width, canvas.height)
-  // getFaceTracking(video).then((res) => {
+
+  if (!cropBox) {
+    cropBox = faceBox
+  } else {
+    // const width = faceBox.width
+    cropBox = {
+      x: cropBox.x + (faceBox.x - cropBox.x) / 5,
+      y: cropBox.y + (faceBox.y - cropBox.y) / 5,
+      width: cropBox.width + (faceBox.width - cropBox.width) / 5,
+      height: cropBox.height + (faceBox.height - cropBox.height) / 5,
+    }
+  }
+
   const croppedImage = canvas
     .getContext("2d")
-    .getImageData(faceBox.x, faceBox.y, faceBox.width, faceBox.height)
+    .getImageData(cropBox.x, cropBox.y, cropBox.width, cropBox.height)
   const ctxfc = canvasFaceCrop.getContext("2d")
   ctxfc.clearRect(0, 0, canvasFaceCrop.width, canvasFaceCrop.height)
   ctxfc.beginPath()
   ctxfc.putImageData(croppedImage, 0, 0)
-  // })
   setTimeout(draw, 1, video, canvas, context, canvasFaceCrop)
 }
 
@@ -73,14 +75,13 @@ export const getFaceVideoFeed = () => {
 
     const canvasFaceCrop = document.querySelector("#localCanvasCropped")
 
-    localCanvas.width = 640
-    localCanvas.height = 480
-
     localVideo.addEventListener(
       "play",
       () => {
+        localCanvas.width = localVideo.videoWidth
+        localCanvas.height = localVideo.videoHeight
         draw(localVideo, localCanvas, context, canvasFaceCrop)
-        startFaceTracking(localCanvas)
+        getFaceTracking(localCanvas)
       },
       false
     )

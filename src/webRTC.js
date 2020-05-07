@@ -163,9 +163,10 @@ export const openWebcam = () => {
       audio: true,
     })
     const localVideo = document.querySelector("#localVideo")
+
     localVideo.srcObject = stream
 
-    localStream = stream
+    localStream = document.querySelector("#localCanvasCropped").captureStream()
     remoteStream = new MediaStream()
 
     const remoteVideo = document.querySelector("#remoteVideo")
@@ -174,12 +175,13 @@ export const openWebcam = () => {
     const localCanvas = document.querySelector("#localCanvas")
     const context = localCanvas.getContext("2d")
 
-    localCanvas.width = 640 //stream.videoWidth
-    localCanvas.height = 480 //stream.videoHeight
-
     localVideo.addEventListener(
       "play",
-      () => draw(localVideo, localCanvas, context),
+      () => {
+        localCanvas.width = stream.videoWidth
+        localCanvas.height = stream.videoHeight
+        draw(localVideo, localCanvas, context)
+      },
       false
     )
 

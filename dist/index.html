@@ -40,19 +40,14 @@
         </section>
       </div>
     </header>
-    <div id="videos">
-      <canvas id="localCanvasCropped"></canvas>
-      <canvas id="localCanvas"></canvas>
-      <video
-        id="localVideo"
-        muted
-        autoplay
-        playsinline
-        width="0"
-        height="0"
-      ></video>
-      <video id="remoteVideo" autoplay playsinline width="0" height="0"></video>
+    <div style="position: relative;">
+      <div id="videos" style="position: absolute; z-index: -1;">
+        <canvas id="localCanvasCropped"></canvas>
+        <canvas id="localCanvas"></canvas>
+        <video id="localVideo" muted autoplay playsinline></video>
+        <video id="remoteVideo" autoplay playsinline></video>
+      </div>
+      <script src="./bundle.js"></script>
     </div>
-    <script src="./bundle.js"></script>
   </body>
 </html>

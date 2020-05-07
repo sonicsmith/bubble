@@ -1,5 +1,4 @@
 import * as THREE from "three"
-import { getFaceTracking } from "./faceTracking"
 
 let camera, scene, renderer
 
@@ -17,14 +16,21 @@ export const initialiseThreeJS = () => {
 
   renderer = new THREE.WebGLRenderer({ antialias: true })
   renderer.setSize(window.innerWidth, window.innerHeight)
+  renderer.setClearColor(0xf0f0f0)
   document.body.appendChild(renderer.domElement)
+
+  console.log("Threejs initiated, about to animate")
+  animate()
 }
 
 export const addAvatar = () => {
-  const video = document.getElementById("localVideo") // avatars.length
+  const ctx = document.getElementById("localCanvasCropped").getContext("2d")
 
-  const geometry = new THREE.SphereGeometry(0.2, 10, 10)
-  const texture = new THREE.VideoTexture(video)
+  const texture = new THREE.CanvasTexture(ctx.canvas)
+  texture.wrapS = THREE.RepeatWrapping
+  texture.wrapT = THREE.RepeatWrapping
+  texture.repeat.set(1.4, 1.4)
+  texture.offset.set(0, -0.2)
   texture.minFilter = THREE.LinearFilter
   texture.magFilter = THREE.LinearFilter
   texture.format = THREE.RGBFormat
@@ -33,38 +39,24 @@ export const addAvatar = () => {
     map: texture,
     side: THREE.DoubleSide,
   })
+  const geometry = new THREE.SphereGeometry(0.2, 20, 20)
+  const object = new THREE.Mesh(geometry, material)
 
-  const avatar = new THREE.Mesh(geometry, material)
+  object.position.x = 0 //-1 + 0.5 * avatars.length
+  object.position.y = 0
+  object.position.z = -1
 
-  avatar.position.x = 0 //-1 + 0.5 * avatars.length
-  avatar.position.y = 0
-  avatar.position.z = -1
-
-  scene.add(avatar)
-
-  avatars.push({ object: avatar, stream: video })
+  scene.add(object)
+  console.log("Avatar added")
+  avatars.push({ object, texture })
 }
 
 export const animate = () => {
   requestAnimationFrame(animate)
 
-  // avatars.forEach(({ object, stream }) => {
-  //   const faceTracking = getFaceTracking()
-  //   if (faceTracking) {
-  //     faceTracking.then((data) => {
-  //       // console.log(data.box)
-  //       if (data && data.box) {
-  //         const x = data.box.x / stream.videoWidth
-  //         const y = data.box.y / stream.videoHeight
-  //         const width = data.box.width / stream.videoWidth
-  //         const height = data.box.height / stream.videoHeight
-  //         console.log("{ x, y }", x, y)
-  //         object.material.map.offset.x = x //0.4
-  //         object.material.map.offset.y = y //-0.1
-  //       }
-  //     })
-  //   }
-  // })
+  avatars.forEach((avatar) => {
+    avatar.texture.needsUpdate = true
+  })
 
   renderer.render(scene, camera)
 }

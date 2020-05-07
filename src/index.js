@@ -8,11 +8,9 @@ import {
 } from "./webRTC"
 import { initialiseFaceTracking, getFaceVideoFeed } from "./faceTracking"
 
-// initialiseThreeJS()
+initialiseThreeJS()
 // initializeFirebase()
 initialiseFaceTracking()
-
-// animate()
 
 if (window.location.search) {
   const urlParams = new URLSearchParams(window.location.search)
@@ -33,7 +31,7 @@ const createBubble = async () => {
     // createRoom()
     // await openWebcam()
     await getFaceVideoFeed()
-    // addAvatar()
+    addAvatar()
   }
 }
 
