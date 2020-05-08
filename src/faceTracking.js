@@ -1,4 +1,5 @@
 import * as faceapi from "face-api.js"
+import { setStreams } from "./webRTC"
 
 export const initialiseFaceTracking = async () => {
   // load the models
@@ -75,6 +76,10 @@ export const getFaceVideoFeed = () => {
 
     const canvasFaceCrop = document.querySelector("#localCanvasCropped")
 
+    const remoteStream = new MediaStream()
+    const remoteVideo = document.querySelector("#remoteVideo")
+    remoteVideo.srcObject = remoteStream
+
     localVideo.addEventListener(
       "play",
       () => {
@@ -85,6 +90,8 @@ export const getFaceVideoFeed = () => {
       },
       false
     )
+
+    setStreams(canvasFaceCrop.captureStream(), remoteStream)
 
     resolve()
   })

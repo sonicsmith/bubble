@@ -1,6 +1,7 @@
 import firebase from "firebase/app"
 import "firebase/firestore"
 import firebaseConfig from "./../firebaseConfig.json"
+import { addAvatar } from "./webGL"
 
 const configuration = {
   iceServers: [
@@ -20,9 +21,14 @@ export const initializeFirebase = () => {
   firebase.initializeApp(firebaseConfig)
 }
 
-export const createRoom = async () => {
-  await openWebcam()
+export const setStreams = (_localStream, _remoteStream) => {
+  console.log("Set streams")
+  console.log(_localStream, _remoteStream)
+  localStream = _localStream
+  remoteStream = _remoteStream
+}
 
+export const createRoom = async () => {
   const db = firebase.firestore()
   const roomRef = await db.collection("rooms").doc()
 
@@ -67,6 +73,7 @@ export const createRoom = async () => {
     event.streams[0].getTracks().forEach((track) => {
       console.log("Add a track to the remoteStream:", track)
       remoteStream.addTrack(track)
+      addAvatar()
     })
   })
 
@@ -91,8 +98,6 @@ export const createRoom = async () => {
 }
 
 export const joinRoomById = async (roomId) => {
-  await openWebcam()
-
   const db = firebase.firestore()
   const roomRef = db.collection("rooms").doc(`${roomId}`)
   const roomSnapshot = await roomRef.get()
@@ -121,6 +126,7 @@ export const joinRoomById = async (roomId) => {
       event.streams[0].getTracks().forEach((track) => {
         console.log("Add a track to the remoteStream:", track)
         remoteStream.addTrack(track)
+        addAvatar()
       })
     })
 
@@ -151,43 +157,42 @@ export const joinRoomById = async (roomId) => {
   }
 }
 
-const draw = (video, canvas, context) => {
-  context.drawImage(video, 0, 0, canvas.width, canvas.height)
-  setTimeout(draw, 20, video, canvas, context)
-}
+// const draw = (video, canvas, context) => {
+//   context.drawImage(video, 0, 0, canvas.width, canvas.height)
+//   setTimeout(draw, 20, video, canvas, context)
+// }
 
-export const openWebcam = () => {
-  return new Promise(async (resolve, reject) => {
-    const stream = await navigator.mediaDevices.getUserMedia({
-      video: true,
-      audio: true,
-    })
-    const localVideo = document.querySelector("#localVideo")
+// export const openWebcam = () => {
+//   return new Promise(async (resolve, reject) => {
+//     const stream = await navigator.mediaDevices.getUserMedia({
+//       video: true,
+//       audio: true,
+//     })
+//     const localVideo = document.querySelector("#localVideo")
+//     localVideo.srcObject = stream
 
-    localVideo.srcObject = stream
+//     localStream = document.querySelector("#localCanvasCropped").captureStream()
+//     remoteStream = new MediaStream()
 
-    localStream = document.querySelector("#localCanvasCropped").captureStream()
-    remoteStream = new MediaStream()
+//     const remoteVideo = document.querySelector("#remoteVideo")
+//     remoteVideo.srcObject = remoteStream
 
-    const remoteVideo = document.querySelector("#remoteVideo")
-    remoteVideo.srcObject = remoteStream
+//     const localCanvas = document.querySelector("#localCanvas")
+//     const context = localCanvas.getContext("2d")
 
-    const localCanvas = document.querySelector("#localCanvas")
-    const context = localCanvas.getContext("2d")
+//     localVideo.addEventListener(
+//       "play",
+//       () => {
+//         localCanvas.width = stream.videoWidth
+//         localCanvas.height = stream.videoHeight
+//         draw(localVideo, localCanvas, context)
+//       },
+//       false
+//     )
 
-    localVideo.addEventListener(
-      "play",
-      () => {
-        localCanvas.width = stream.videoWidth
-        localCanvas.height = stream.videoHeight
-        draw(localVideo, localCanvas, context)
-      },
-      false
-    )
-
-    resolve()
-  })
-}
+//     resolve()
+//   })
+// }
 
 export const hangUp = async (e) => {
   const tracks = document.querySelector("#localVideo").srcObject.getTracks()

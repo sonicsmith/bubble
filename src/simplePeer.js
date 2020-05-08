@@ -7,7 +7,7 @@ export const joinConnection = (offer, ownStream) => {
   const roomRef = await db.collection("rooms").doc()
   console.log("Firestore roomRef", roomRef)
   console.log("Joining connection")
-  const peer = new Peer() //({ initiator: false, stream: ownStream })
+  const peer = new Peer({ initiator: false, stream: ownStream })
 
   peer.on("error", (err) => console.log("error", err))
 
