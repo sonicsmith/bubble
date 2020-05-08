@@ -24,16 +24,9 @@ export const initialiseThreeJS = () => {
 }
 
 export const addAvatar = () => {
-  // const ctx = document.getElementById("localCanvasCropped").getContext("2d")
-  // const texture = new THREE.CanvasTexture(ctx.canvas)
-
   const video = document.getElementById("remoteVideo")
   const texture = new THREE.VideoTexture(video)
 
-  // texture.wrapS = THREE.RepeatWrapping
-  // texture.wrapT = THREE.RepeatWrapping
-  // texture.repeat.set(1.4, 1.4)
-  // texture.offset.set(0, -0.2)
   texture.minFilter = THREE.LinearFilter
   texture.magFilter = THREE.LinearFilter
   texture.format = THREE.RGBFormat
@@ -56,10 +49,6 @@ export const addAvatar = () => {
 
 export const animate = () => {
   requestAnimationFrame(animate)
-
-  avatars.forEach((avatar) => {
-    avatar.texture.needsUpdate = true
-  })
 
   renderer.render(scene, camera)
 }
