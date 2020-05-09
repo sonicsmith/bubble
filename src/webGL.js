@@ -1,4 +1,5 @@
 import * as THREE from "three"
+import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader.js"
 
 let camera, scene, renderer
 
@@ -26,7 +27,9 @@ export const initialiseThreeJS = () => {
 export const addAvatar = () => {
   const video = document.getElementById("remoteVideo")
   const texture = new THREE.VideoTexture(video)
-
+  texture.repeat.set(2, 2)
+  console.log("texture.offset", texture.offset)
+  texture.offset.set(-0.1, -0.3)
   texture.minFilter = THREE.LinearFilter
   texture.magFilter = THREE.LinearFilter
   texture.format = THREE.RGBFormat
@@ -35,6 +38,7 @@ export const addAvatar = () => {
     map: texture,
     side: THREE.DoubleSide,
   })
+
   const geometry = new THREE.SphereGeometry(0.2, 20, 20)
   const object = new THREE.Mesh(geometry, material)
 
@@ -45,6 +49,7 @@ export const addAvatar = () => {
   scene.add(object)
   console.log("Avatar added")
   avatars.push({ object, texture })
+  scene.add(object)
 }
 
 export const animate = () => {

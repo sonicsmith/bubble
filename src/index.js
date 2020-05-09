@@ -15,6 +15,7 @@ const createBubble = async () => {
 
 const joinBubble = async (id) => {
   await getFaceVideoFeed()
+  createBubbleButton.textContent = "highlight_off"
   console.log("Joining bubble")
   joinRoomById(id)
 }
