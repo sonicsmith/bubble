@@ -17,7 +17,7 @@ export const initialiseThreeJS = () => {
 
   renderer = new THREE.WebGLRenderer({ antialias: true })
   renderer.setSize(window.innerWidth, window.innerHeight)
-  renderer.setClearColor(0xf0f0f0)
+  renderer.setClearColor(0x555555)
   document.body.appendChild(renderer.domElement)
 
   console.log("Threejs initiated, about to animate")
