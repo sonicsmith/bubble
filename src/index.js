@@ -1,5 +1,11 @@
 import { initialiseThreeJS } from "./webGL"
-import { initializeFirebase, createRoom, joinRoomById, hangUp } from "./webRTC"
+import {
+  initializeFirebase,
+  createRoom,
+  joinRoomById,
+  hangUp,
+  getBubbleLink,
+} from "./webRTC"
 import { initialiseFaceTracking, getFaceVideoFeed } from "./faceTracking"
 
 initialiseThreeJS()
@@ -14,8 +20,8 @@ const createBubble = async () => {
 }
 
 const joinBubble = async (id) => {
-  await getFaceVideoFeed()
   createBubbleButton.textContent = "highlight_off"
+  await getFaceVideoFeed()
   console.log("Joining bubble")
   joinRoomById(id)
 }
@@ -38,6 +44,13 @@ const toggleConnection = () => {
   }
 }
 
+const showBubbleInfo = () => {
+  const bubbleLink = getBubbleLink()
+  alert(bubbleLink)
+}
+
 document
   .querySelector("#createBubbleButton")
   .addEventListener("click", toggleConnection)
+document.querySelector("#shareBubble").style.visibility = "hidden"
+document.querySelector("#shareBubble").addEventListener("click", showBubbleInfo)

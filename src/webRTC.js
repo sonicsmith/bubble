@@ -16,6 +16,7 @@ let peerConnection = null
 let localStream = null
 let remoteStream = null
 let roomId = null
+let bubbleLink = null
 
 export const initializeFirebase = () => {
   firebase.initializeApp(firebaseConfig)
@@ -26,6 +27,10 @@ export const setStreams = (_localStream, _remoteStream) => {
   console.log(_localStream, _remoteStream)
   localStream = _localStream
   remoteStream = _remoteStream
+}
+
+export const getBubbleLink = () => {
+  return bubbleLink || "Not connected to a bubble"
 }
 
 export const createRoom = async () => {
@@ -66,7 +71,9 @@ export const createRoom = async () => {
   roomId = roomRef.id
   console.log(`New room created with SDP offer. Room ID: ${roomRef.id}`)
 
-  console.log(location.href + "?id=" + roomRef.id)
+  bubbleLink = location.href + "?id=" + roomRef.id
+  document.querySelector("#shareBubble").style.visibility = "visible"
+  console.log("bubbleLink:", bubbleLink)
 
   peerConnection.addEventListener("track", (event) => {
     console.log("Got remote track:", event.streams[0])
@@ -225,6 +232,8 @@ export const hangUp = async (e) => {
     })
     await roomRef.delete()
   }
+  document.querySelector("#shareBubble").style.visibility = "hidden"
+  bubbleLink = null
 
   document.location.reload(true)
 }
