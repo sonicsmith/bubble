@@ -36,7 +36,6 @@ if (window.location.search) {
 const toggleConnection = () => {
   const createBubbleButton = document.querySelector("#createBubbleButton")
   if (createBubbleButton.textContent === "highlight_off") {
-    console.log("Hang up")
     hangUp()
     createBubbleButton.textContent = "add"
   } else {

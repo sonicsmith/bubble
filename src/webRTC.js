@@ -164,44 +164,8 @@ export const joinRoomById = async (roomId) => {
   }
 }
 
-// const draw = (video, canvas, context) => {
-//   context.drawImage(video, 0, 0, canvas.width, canvas.height)
-//   setTimeout(draw, 20, video, canvas, context)
-// }
-
-// export const openWebcam = () => {
-//   return new Promise(async (resolve, reject) => {
-//     const stream = await navigator.mediaDevices.getUserMedia({
-//       video: true,
-//       audio: true,
-//     })
-//     const localVideo = document.querySelector("#localVideo")
-//     localVideo.srcObject = stream
-
-//     localStream = document.querySelector("#localCanvasCropped").captureStream()
-//     remoteStream = new MediaStream()
-
-//     const remoteVideo = document.querySelector("#remoteVideo")
-//     remoteVideo.srcObject = remoteStream
-
-//     const localCanvas = document.querySelector("#localCanvas")
-//     const context = localCanvas.getContext("2d")
-
-//     localVideo.addEventListener(
-//       "play",
-//       () => {
-//         localCanvas.width = stream.videoWidth
-//         localCanvas.height = stream.videoHeight
-//         draw(localVideo, localCanvas, context)
-//       },
-//       false
-//     )
-
-//     resolve()
-//   })
-// }
-
 export const hangUp = async (e) => {
+  console.log("Hang up")
   const tracks = document.querySelector("#localVideo").srcObject.getTracks()
   tracks.forEach((track) => {
     track.stop()
