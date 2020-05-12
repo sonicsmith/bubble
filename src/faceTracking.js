@@ -90,14 +90,11 @@ export const getFaceVideoFeed = () => {
         draw(localVideo, localCanvas, context, canvasFaceCrop)
         getFaceTracking(localCanvas)
 
-        // Combine canvas stream with
-        const ctx = new AudioContext()
-        const dest = ctx.createMediaStreamDestination()
-        const sourceNode = ctx.createMediaElementSource(localVideo)
-        sourceNode.connect(dest)
-        sourceNode.connect(ctx.destination)
-        const audioTrack = dest.stream.getAudioTracks()[0]
+        // Combine canvas stream with webcam audio
         const localStream = canvasFaceCrop.captureStream()
+        const audioTrack = stream
+          .getTracks()
+          .filter((t) => t.kind === "audio")[0]
         localStream.addTrack(audioTrack)
 
         setStreams(localStream, remoteStream)
