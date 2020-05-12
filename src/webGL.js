@@ -1,9 +1,33 @@
 import * as THREE from "three"
 import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader.js"
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js"
 
 let camera, scene, renderer
 
 const avatars = []
+
+const addSkyBox = () => {
+  const materialArray = []
+  const texture_ft = new THREE.TextureLoader().load("obj/skybox/valley_ft.jpg")
+  const texture_bk = new THREE.TextureLoader().load("obj/skybox/valley_bk.jpg")
+  const texture_up = new THREE.TextureLoader().load("obj/skybox/valley_up.jpg")
+  const texture_dn = new THREE.TextureLoader().load("obj/skybox/valley_dn.jpg")
+  const texture_rt = new THREE.TextureLoader().load("obj/skybox/valley_rt.jpg")
+  const texture_lf = new THREE.TextureLoader().load("obj/skybox/valley_lf.jpg")
+
+  materialArray.push(new THREE.MeshBasicMaterial({ map: texture_ft }))
+  materialArray.push(new THREE.MeshBasicMaterial({ map: texture_bk }))
+  materialArray.push(new THREE.MeshBasicMaterial({ map: texture_up }))
+  materialArray.push(new THREE.MeshBasicMaterial({ map: texture_dn }))
+  materialArray.push(new THREE.MeshBasicMaterial({ map: texture_rt }))
+  materialArray.push(new THREE.MeshBasicMaterial({ map: texture_lf }))
+
+  for (let i = 0; i < 6; i++) materialArray[i].side = THREE.BackSide
+
+  const skyboxGeo = new THREE.BoxGeometry(10, 10, 10)
+  const skybox = new THREE.Mesh(skyboxGeo, materialArray)
+  scene.add(skybox)
+}
 
 export const initialiseThreeJS = () => {
   camera = new THREE.PerspectiveCamera(
@@ -12,7 +36,7 @@ export const initialiseThreeJS = () => {
     0.01,
     10
   )
-
+  // camera.lookAt(0, 0, 0);
   scene = new THREE.Scene()
 
   renderer = new THREE.WebGLRenderer({ antialias: true })
@@ -20,9 +44,17 @@ export const initialiseThreeJS = () => {
   renderer.setClearColor(0x444444)
   document.body.appendChild(renderer.domElement)
 
+  addSkyBox()
+
+  // const controls = new OrbitControls(camera, renderer.domElement)
+  // controls.minDistance = 10
+  // controls.maxDistance = 11
+
   console.log("Threejs initiated, about to animate")
   animate()
 }
+
+const positionAvatars = (avatars) => {}
 
 export const addAvatar = () => {
   const video = document.getElementById("remoteVideo")
@@ -52,8 +84,7 @@ export const addAvatar = () => {
   scene.add(object)
 }
 
-export const animate = () => {
+const animate = () => {
   requestAnimationFrame(animate)
-
   renderer.render(scene, camera)
 }
