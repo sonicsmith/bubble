@@ -80,8 +80,8 @@ export const createRoom = async () => {
     event.streams[0].getTracks().forEach((track) => {
       console.log("Add a track to the remoteStream:", track)
       remoteStream.addTrack(track)
-      addAvatar()
     })
+    addAvatar()
   })
 
   roomRef.onSnapshot(async (snapshot) => {
@@ -133,8 +133,8 @@ export const joinRoomById = async (roomId) => {
       event.streams[0].getTracks().forEach((track) => {
         console.log("Add a track to the remoteStream:", track)
         remoteStream.addTrack(track)
-        addAvatar()
       })
+      addAvatar()
     })
 
     const offer = roomSnapshot.data().offer

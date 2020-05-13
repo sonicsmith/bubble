@@ -24,19 +24,18 @@ const addSkyBox = () => {
 
   for (let i = 0; i < 6; i++) materialArray[i].side = THREE.BackSide
 
-  const skyboxGeo = new THREE.BoxGeometry(10, 10, 10)
+  const skyboxGeo = new THREE.BoxGeometry(50, 50, 50)
   const skybox = new THREE.Mesh(skyboxGeo, materialArray)
   scene.add(skybox)
 }
 
 export const initialiseThreeJS = () => {
   camera = new THREE.PerspectiveCamera(
-    70,
+    50,
     window.innerWidth / window.innerHeight,
-    0.01,
-    10
+    0.1,
+    1000
   )
-  // camera.lookAt(0, 0, 0);
   scene = new THREE.Scene()
 
   renderer = new THREE.WebGLRenderer({ antialias: true })
@@ -46,22 +45,43 @@ export const initialiseThreeJS = () => {
 
   addSkyBox()
 
-  // const controls = new OrbitControls(camera, renderer.domElement)
-  // controls.minDistance = 10
-  // controls.maxDistance = 11
+  const controls = new OrbitControls(camera, renderer.domElement)
+  controls.minDistance = 0.1
+  controls.maxDistance = 0.1
 
-  console.log("Threejs initiated, about to animate")
+  const onWindowResize = () => {
+    camera.aspect = window.innerWidth / window.innerHeight
+    camera.updateProjectionMatrix()
+    controls.update()
+    renderer.setSize(window.innerWidth, window.innerHeight)
+  }
+  window.addEventListener("resize", onWindowResize, false)
+
+  console.log("Threejs initiated, about to start animation thread")
   animate()
 }
 
-const positionAvatars = (avatars) => {}
+const positionAvatars = (avatars) => {
+  const numSpaces = avatars.length + 1
+  const totalLength = 12
+  const spacingDistance = totalLength / numSpaces
+  const startOffset = Math.ceil(avatars.length / 2) - 0.5
+
+  console.log({ numSpaces, spacingDistance, startOffset })
+
+  for (let i = 0; i < avatars.length; i++) {
+    avatars[i].object.position.x = (i - startOffset) * spacingDistance
+    avatars[i].object.position.y = 0
+    avatars[i].object.position.z = -7
+    avatars[i].object.lookAt(0, 0, 0)
+  }
+}
 
 export const addAvatar = () => {
   const video = document.getElementById("remoteVideo")
   const texture = new THREE.VideoTexture(video)
   texture.repeat.set(2, 2)
-  console.log("texture.offset", texture.offset)
-  texture.offset.set(-0.1, -0.3)
+  texture.offset.set(-0.3, -0.3)
   texture.minFilter = THREE.LinearFilter
   texture.magFilter = THREE.LinearFilter
   texture.format = THREE.RGBFormat
@@ -71,20 +91,21 @@ export const addAvatar = () => {
     side: THREE.DoubleSide,
   })
 
-  const geometry = new THREE.SphereGeometry(0.2, 20, 20)
+  // Create head sphere
+  const geometry = new THREE.SphereGeometry(1, 20, 20)
   const object = new THREE.Mesh(geometry, material)
-
-  object.position.x = 0 //-1 + 0.5 * avatars.length
-  object.position.y = 0
-  object.position.z = -1
 
   scene.add(object)
   console.log("Avatar added")
   avatars.push({ object, texture })
+
+  positionAvatars(avatars)
+
   scene.add(object)
 }
 
 const animate = () => {
   requestAnimationFrame(animate)
+
   renderer.render(scene, camera)
 }
