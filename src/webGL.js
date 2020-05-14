@@ -1,5 +1,5 @@
 import * as THREE from "three"
-import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader.js"
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js"
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js"
 
 let camera, scene, renderer
@@ -45,6 +45,10 @@ export const initialiseThreeJS = () => {
 
   addSkyBox()
 
+  const light = new THREE.PointLight(0xffffff, 5, 100)
+  light.position.set(0, 0, 0)
+  scene.add(light)
+
   const controls = new OrbitControls(camera, renderer.domElement)
   controls.minDistance = 0.1
   controls.maxDistance = 0.1
@@ -65,9 +69,7 @@ const positionAvatars = (avatars) => {
   const numSpaces = avatars.length + 1
   const totalLength = 12
   const spacingDistance = totalLength / numSpaces
-  const startOffset = Math.ceil(avatars.length / 2) - 0.5
-
-  console.log({ numSpaces, spacingDistance, startOffset })
+  const startOffset = Math.ceil(avatars.length / 2) - 1
 
   for (let i = 0; i < avatars.length; i++) {
     avatars[i].object.position.x = (i - startOffset) * spacingDistance
@@ -91,17 +93,35 @@ export const addAvatar = () => {
     side: THREE.DoubleSide,
   })
 
-  // Create head sphere
-  const geometry = new THREE.SphereGeometry(1, 20, 20)
-  const object = new THREE.Mesh(geometry, material)
+  const loader = new GLTFLoader()
+  loader.load(
+    "obj/hoodie/scene.gltf",
+    (gltf) => {
+      console.log(gltf)
 
-  scene.add(object)
+      gltf.scene.children[0].position.y = -1.8
+      gltf.scene.children[0].position.z = -5
+
+      gltf.scene.children[0].scale.x = 350
+      gltf.scene.children[0].scale.y = 350
+      gltf.scene.children[0].scale.z = 350
+
+      // Create head sphere
+      const geometry = new THREE.SphereGeometry(1, 20, 20)
+      const headSphere = new THREE.Mesh(geometry, material)
+      headSphere.position.z = -6
+      gltf.scene.add(headSphere)
+
+      scene.add(gltf.scene)
+    },
+    undefined,
+    console.error
+  )
+
+  // avatars.push({ object, texture })
+  // positionAvatars(avatars)
+
   console.log("Avatar added")
-  avatars.push({ object, texture })
-
-  positionAvatars(avatars)
-
-  scene.add(object)
 }
 
 const animate = () => {

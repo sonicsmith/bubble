@@ -40,7 +40,7 @@ export const createRoom = async () => {
   console.log("Create PeerConnection with configuration: ", configuration)
   peerConnection = new RTCPeerConnection(configuration)
 
-  registerPeerConnectionListeners()
+  // registerPeerConnectionListeners()
 
   localStream.getTracks().forEach((track) => {
     peerConnection.addTrack(track, localStream)
@@ -78,10 +78,11 @@ export const createRoom = async () => {
   peerConnection.addEventListener("track", (event) => {
     console.log("Got remote track:", event.streams[0])
     event.streams[0].getTracks().forEach((track) => {
-      console.log("Add a track to the remoteStream:", track)
       remoteStream.addTrack(track)
     })
-    addAvatar()
+    if (event.track.kind === "video") {
+      addAvatar()
+    }
   })
 
   roomRef.onSnapshot(async (snapshot) => {
@@ -113,7 +114,7 @@ export const joinRoomById = async (roomId) => {
   if (roomSnapshot.exists) {
     console.log("Create PeerConnection with configuration: ", configuration)
     peerConnection = new RTCPeerConnection(configuration)
-    registerPeerConnectionListeners()
+    // registerPeerConnectionListeners()
     localStream.getTracks().forEach((track) => {
       peerConnection.addTrack(track, localStream)
     })
@@ -131,10 +132,11 @@ export const joinRoomById = async (roomId) => {
     peerConnection.addEventListener("track", (event) => {
       console.log("Got remote track:", event.streams[0])
       event.streams[0].getTracks().forEach((track) => {
-        console.log("Add a track to the remoteStream:", track)
         remoteStream.addTrack(track)
       })
-      addAvatar()
+      if (event.track.kind === "video") {
+        addAvatar()
+      }
     })
 
     const offer = roomSnapshot.data().offer
