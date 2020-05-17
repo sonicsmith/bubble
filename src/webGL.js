@@ -49,9 +49,9 @@ export const initialiseThreeJS = () => {
   light.position.set(0, 0, 0)
   scene.add(light)
 
-  const controls = new OrbitControls(camera, renderer.domElement)
-  controls.minDistance = 0.1
-  controls.maxDistance = 0.1
+  // const controls = new OrbitControls(camera, renderer.domElement)
+  // controls.minDistance = 0.1
+  // controls.maxDistance = 0.1
 
   const onWindowResize = () => {
     camera.aspect = window.innerWidth / window.innerHeight
@@ -83,7 +83,7 @@ export const addAvatar = () => {
   const video = document.getElementById("remoteVideo")
   const texture = new THREE.VideoTexture(video)
   texture.repeat.set(2, 2)
-  texture.offset.set(-0.3, -0.3)
+  texture.offset.set(-0.2, -0.3) //(-0.3, -0.3)
   texture.minFilter = THREE.LinearFilter
   texture.magFilter = THREE.LinearFilter
   texture.format = THREE.RGBFormat
@@ -99,12 +99,12 @@ export const addAvatar = () => {
     (gltf) => {
       console.log(gltf)
 
-      gltf.scene.children[0].position.y = -1.8
-      gltf.scene.children[0].position.z = -5
-
-      gltf.scene.children[0].scale.x = 350
-      gltf.scene.children[0].scale.y = 350
-      gltf.scene.children[0].scale.z = 350
+      gltf.scene.children[0].position.y = -4.3
+      gltf.scene.children[0].position.z = -5.5
+      const SCALE = 7.7
+      gltf.scene.children[0].scale.x = SCALE
+      gltf.scene.children[0].scale.y = SCALE
+      gltf.scene.children[0].scale.z = SCALE
 
       // Create head sphere
       const geometry = new THREE.SphereGeometry(1, 20, 20)
