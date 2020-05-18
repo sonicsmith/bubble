@@ -1,6 +1,8 @@
 import * as faceapi from "face-api.js"
 import { setStreams } from "./webRTC"
 
+let canvasDimensions = {}
+
 export const initialiseFaceTracking = async () => {
   // load the models
   await faceapi.nets.tinyFaceDetector.loadFromUri("/models")
@@ -21,6 +23,20 @@ let faceBox = {
 
 // This is the position of the current crop
 let cropBox
+
+export const getFaceTrackingOffset = () => {
+  if (!cropBox) {
+    return
+  }
+  return {
+    x: cropBox.x,
+    y: cropBox.y,
+  }
+}
+
+export const getWebcamCanvasDimensions = () => {
+  return canvasDimensions
+}
 
 // Get the coordinates of the face, and set faceBox variables
 const getFaceTracking = (input) => {
@@ -86,6 +102,10 @@ export const getFaceVideoFeed = () => {
       () => {
         localCanvas.width = localVideo.videoWidth
         localCanvas.height = localVideo.videoHeight
+        canvasDimensions = {
+          width: localCanvas.width,
+          height: localCanvas.height,
+        }
         const canvasFaceCrop = document.querySelector("#localCanvasCropped")
         draw(localVideo, localCanvas, context, canvasFaceCrop)
         getFaceTracking(localCanvas)

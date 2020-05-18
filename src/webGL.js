@@ -1,6 +1,7 @@
 import * as THREE from "three"
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js"
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js"
+import { getFaceTrackingOffset } from "./faceTracking"
 
 let camera, scene, renderer
 
@@ -8,21 +9,20 @@ const avatars = []
 
 const addSkyBox = () => {
   const materialArray = []
-  const texture_ft = new THREE.TextureLoader().load("obj/skybox/valley_ft.jpg")
-  const texture_bk = new THREE.TextureLoader().load("obj/skybox/valley_bk.jpg")
-  const texture_up = new THREE.TextureLoader().load("obj/skybox/valley_up.jpg")
-  const texture_dn = new THREE.TextureLoader().load("obj/skybox/valley_dn.jpg")
-  const texture_rt = new THREE.TextureLoader().load("obj/skybox/valley_rt.jpg")
-  const texture_lf = new THREE.TextureLoader().load("obj/skybox/valley_lf.jpg")
+  const skyboxImages = [
+    "valley_ft.jpg",
+    "valley_bk.jpg",
+    "valley_up.jpg",
+    "valley_dn.jpg",
+    "valley_rt.jpg",
+    "valley_lf.jpg",
+  ]
 
-  materialArray.push(new THREE.MeshBasicMaterial({ map: texture_ft }))
-  materialArray.push(new THREE.MeshBasicMaterial({ map: texture_bk }))
-  materialArray.push(new THREE.MeshBasicMaterial({ map: texture_up }))
-  materialArray.push(new THREE.MeshBasicMaterial({ map: texture_dn }))
-  materialArray.push(new THREE.MeshBasicMaterial({ map: texture_rt }))
-  materialArray.push(new THREE.MeshBasicMaterial({ map: texture_lf }))
-
-  for (let i = 0; i < 6; i++) materialArray[i].side = THREE.BackSide
+  skyboxImages.forEach((imageName, i) => {
+    const map = new THREE.TextureLoader().load(`obj/skybox/${imageName}`)
+    materialArray.push(new THREE.MeshBasicMaterial({ map }))
+    materialArray[i].side = THREE.BackSide
+  })
 
   const skyboxGeo = new THREE.BoxGeometry(50, 50, 50)
   const skybox = new THREE.Mesh(skyboxGeo, materialArray)
@@ -49,14 +49,9 @@ export const initialiseThreeJS = () => {
   light.position.set(0, 0, 0)
   scene.add(light)
 
-  // const controls = new OrbitControls(camera, renderer.domElement)
-  // controls.minDistance = 0.1
-  // controls.maxDistance = 0.1
-
   const onWindowResize = () => {
     camera.aspect = window.innerWidth / window.innerHeight
     camera.updateProjectionMatrix()
-    controls.update()
     renderer.setSize(window.innerWidth, window.innerHeight)
   }
   window.addEventListener("resize", onWindowResize, false)
@@ -124,8 +119,29 @@ export const addAvatar = () => {
   console.log("Avatar added")
 }
 
+let lastOffset
+const CAMERA_SENSITIVITY = 0.01
+
+const setCameraMovement = () => {
+  const newCameraOffset = getFaceTrackingOffset()
+  if (newCameraOffset) {
+    if (lastOffset) {
+      camera.translateX((lastOffset.x - newCameraOffset.x) * CAMERA_SENSITIVITY)
+      camera.translateY((lastOffset.y - newCameraOffset.y) * CAMERA_SENSITIVITY)
+      camera.lookAt(0, 0, -7) // TODO: middle spot
+    } else {
+      // Set default offset (TODO: Do it better)
+      camera.translateX(3)
+      camera.translateY(2)
+    }
+    lastOffset = newCameraOffset
+  }
+}
+
 const animate = () => {
   requestAnimationFrame(animate)
+
+  setCameraMovement()
 
   renderer.render(scene, camera)
 }
