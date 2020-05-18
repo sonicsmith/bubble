@@ -7,23 +7,28 @@ import {
   getBubbleLink,
 } from "./webRTC"
 import { initialiseFaceTracking, getFaceVideoFeed } from "./faceTracking"
+import { setStatusText } from "./ui"
 
 initialiseThreeJS()
 initializeFirebase()
 initialiseFaceTracking()
 
 const createBubble = async () => {
+  setStatusText("Creating bubble...")
   console.log("Create Bubble")
   createBubbleButton.textContent = "highlight_off"
   await getFaceVideoFeed()
   createRoom()
+  setStatusText("Inside bubble")
 }
 
 const joinBubble = async (id) => {
+  setStatusText("Joining bubble...")
   createBubbleButton.textContent = "highlight_off"
   await getFaceVideoFeed()
   console.log("Joining bubble")
   joinRoomById(id)
+  setStatusText("Inside bubble")
 }
 
 if (window.location.search) {
