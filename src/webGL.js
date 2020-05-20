@@ -60,17 +60,15 @@ export const initialiseThreeJS = () => {
   animate()
 }
 
-const positionAvatars = (avatars) => {
-  const numSpaces = avatars.length + 1
-  const totalLength = 12
-  const spacingDistance = totalLength / numSpaces
-  const startOffset = Math.ceil(avatars.length / 2) - 1
+const repositionAvatars = (avatars) => {
+  const visibleCircumference = 0.5 * Math.PI
+  const count = avatars.length
+  const halfCount = Math.ceil(count / 2)
+  const offset = halfCount + (count % 2 === 0 && 0.5) - 1
 
-  for (let i = 0; i < avatars.length; i++) {
-    avatars[i].object.position.x = (i - startOffset) * spacingDistance
-    avatars[i].object.position.y = 0
-    avatars[i].object.position.z = -7
-    avatars[i].object.lookAt(0, 0, 0)
+  const spacing = visibleCircumference / (count + 1)
+  for (let i = 0; i < count; i++) {
+    avatars[i].rotation.y = i * spacing - offset * spacing
   }
 }
 
@@ -92,8 +90,6 @@ export const addAvatar = () => {
   loader.load(
     "obj/hoodie/scene.gltf",
     (gltf) => {
-      console.log(gltf)
-
       gltf.scene.children[0].position.y = -4.3
       gltf.scene.children[0].position.z = -5.5
       const SCALE = 7.7
@@ -105,16 +101,19 @@ export const addAvatar = () => {
       const geometry = new THREE.SphereGeometry(1, 20, 20)
       const headSphere = new THREE.Mesh(geometry, material)
       headSphere.position.z = -6
-      gltf.scene.add(headSphere)
 
-      scene.add(gltf.scene)
+      const avatar = new THREE.Group()
+      avatar.add(gltf.scene.children[0])
+      avatar.add(headSphere)
+      avatars.push(avatar)
+
+      repositionAvatars(avatars)
+
+      scene.add(avatar)
     },
     undefined,
     console.error
   )
-
-  // avatars.push({ object, texture })
-  // positionAvatars(avatars)
 
   console.log("Avatar added")
 }

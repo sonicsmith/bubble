@@ -1,34 +1,26 @@
-import { initialiseThreeJS } from "./webGL"
-import {
-  initializeFirebase,
-  createRoom,
-  joinRoomById,
-  hangUp,
-  getBubbleLink,
-} from "./webRTC"
-import { initialiseFaceTracking, getFaceVideoFeed } from "./faceTracking"
-import { setStatusText } from "./ui"
+import * as webGL from "./webGL"
+import * as webRTC from "./webRTC"
+import * as faceTracking from "./faceTracking"
+import * as ui from "./ui"
 
-initialiseThreeJS()
-initializeFirebase()
-initialiseFaceTracking()
+webGL.initialiseThreeJS()
+webRTC.initializeFirebase()
+faceTracking.initialiseFaceTracking()
 
 const createBubble = async () => {
-  setStatusText("Creating bubble...")
-  console.log("Create Bubble")
-  createBubbleButton.textContent = "highlight_off"
-  await getFaceVideoFeed()
-  createRoom()
-  setStatusText("Inside bubble")
+  ui.setStatusText("Creating bubble...")
+  await faceTracking.getFaceVideoFeed()
+  await webRTC.createRoom()
+  ui.setStatusText("Inside bubble")
+  ui.setBubbleIsConnected(true)
 }
 
 const joinBubble = async (id) => {
-  setStatusText("Joining bubble...")
-  createBubbleButton.textContent = "highlight_off"
-  await getFaceVideoFeed()
-  console.log("Joining bubble")
-  joinRoomById(id)
-  setStatusText("Inside bubble")
+  ui.setStatusText("Joining bubble...")
+  await faceTracking.getFaceVideoFeed()
+  await webRTC.joinRoomById(id)
+  ui.setStatusText("Inside bubble")
+  ui.setBubbleIsConnected(true)
 }
 
 if (window.location.search) {
@@ -42,7 +34,6 @@ const toggleConnection = () => {
   const createBubbleButton = document.querySelector("#createBubbleButton")
   if (createBubbleButton.textContent === "highlight_off") {
     hangUp()
-    createBubbleButton.textContent = "add"
   } else {
     createBubble()
   }
