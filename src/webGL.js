@@ -72,8 +72,9 @@ const repositionAvatars = (avatars) => {
   }
 }
 
-export const addAvatar = () => {
-  const video = document.getElementById("remoteVideo")
+export const addAvatar = (videoId) => {
+  console.log("Adding Avatar")
+  const video = document.getElementById(`remoteVideo-${videoId}`)
   const texture = new THREE.VideoTexture(video)
   texture.repeat.set(2, 2)
   texture.offset.set(-0.2, -0.3) //(-0.3, -0.3)

@@ -11,7 +11,7 @@ const configuration = {
 
 let peerConnection = null
 let localStream = null
-let remoteStream = null
+let remoteStreams = {}
 let roomId = null
 let bubbleLink = null
 
@@ -19,13 +19,41 @@ export const initializeFirebase = () => {
   firebase.initializeApp(firebaseConfig)
 }
 
-export const setStreams = (_localStream, _remoteStream) => {
+// Here we set the webcam stream to local, and create a new remote stream
+// linked to our remote video
+export const setLocalStream = (_localStream) => {
   localStream = _localStream
-  remoteStream = _remoteStream
 }
 
 export const getBubbleLink = () => {
   return bubbleLink || "Not connected to a bubble"
+}
+
+const addRemoteTrack = (event) => {
+  //o=- 7348270952974862556 2 IN IP4 127.0.0.1
+  // const { sdp } = event.target.localDescription
+  // const id = sdp.split("\n")[0].substr(4, 19)
+  console.log(event)
+  const id = "1"
+  if (!remoteStreams[id]) {
+    console.log("Creating new remote video element")
+    const section = document.getElementById("videos")
+    const remoteVideo = document.createElement("video")
+    section.appendChild(remoteVideo)
+    remoteVideo.setAttribute("id", `remoteVideo-${id}`)
+    remoteVideo.setAttribute("autoplay", true)
+    remoteVideo.setAttribute("playsinline", true)
+    const newStream = new MediaStream()
+    remoteVideo.srcObject = newStream
+    remoteStreams[id] = newStream
+  }
+  event.streams[0].getTracks().forEach((track) => {
+    remoteStreams[id].addTrack(track)
+  })
+  if (event.track.kind === "video") {
+    addAvatar(id)
+  }
+  console.log("Added remote track, id", id)
 }
 
 export const createRoom = () => {
@@ -33,7 +61,6 @@ export const createRoom = () => {
     const db = firebase.firestore()
     const roomRef = await db.collection("rooms").doc()
 
-    console.log("Create PeerConnection with configuration: ", configuration)
     peerConnection = new RTCPeerConnection(configuration)
 
     // registerPeerConnectionListeners()
@@ -49,13 +76,12 @@ export const createRoom = () => {
         console.log("Got final candidate!")
         return
       }
-      console.log("Got candidate: ", event.candidate)
+      console.log("Got candidate, address: ", event.candidate.address)
       callerCandidatesCollection.add(event.candidate.toJSON())
     })
 
     const offer = await peerConnection.createOffer()
     await peerConnection.setLocalDescription(offer)
-    console.log("Created offer:", offer)
 
     const roomWithOffer = {
       offer: {
@@ -72,13 +98,7 @@ export const createRoom = () => {
     console.log("bubbleLink:", bubbleLink)
 
     peerConnection.addEventListener("track", (event) => {
-      console.log("Got remote track:", event.streams[0])
-      event.streams[0].getTracks().forEach((track) => {
-        remoteStream.addTrack(track)
-      })
-      if (event.track.kind === "video") {
-        addAvatar()
-      }
+      addRemoteTrack(event)
     })
 
     roomRef.onSnapshot(async (snapshot) => {
@@ -94,7 +114,7 @@ export const createRoom = () => {
       snapshot.docChanges().forEach(async (change) => {
         if (change.type === "added") {
           let data = change.doc.data()
-          console.log(`Got new remote ICE candidate: ${JSON.stringify(data)}`)
+          console.log("Got new remote ICE candidate:")
           await peerConnection.addIceCandidate(new RTCIceCandidate(data))
         }
       })
@@ -111,7 +131,6 @@ export const joinRoomById = async (roomId) => {
     console.log("Got room:", roomSnapshot.exists)
 
     if (roomSnapshot.exists) {
-      console.log("Create PeerConnection with configuration: ", configuration)
       peerConnection = new RTCPeerConnection(configuration)
       // registerPeerConnectionListeners()
       localStream.getTracks().forEach((track) => {
@@ -124,18 +143,12 @@ export const joinRoomById = async (roomId) => {
           console.log("Got final candidate!")
           return
         }
-        console.log("Got candidate: ", event.candidate)
+        console.log("Got candidate, address: ", event.candidate.address)
         calleeCandidatesCollection.add(event.candidate.toJSON())
       })
 
       peerConnection.addEventListener("track", (event) => {
-        console.log("Got remote track:", event.streams[0])
-        event.streams[0].getTracks().forEach((track) => {
-          remoteStream.addTrack(track)
-        })
-        if (event.track.kind === "video") {
-          addAvatar()
-        }
+        addRemoteTrack(event)
       })
 
       const offer = roomSnapshot.data().offer
@@ -159,7 +172,7 @@ export const joinRoomById = async (roomId) => {
         snapshot.docChanges().forEach(async (change) => {
           if (change.type === "added") {
             let data = change.doc.data()
-            console.log(`Got new remote ICE candidate: ${JSON.stringify(data)}`)
+            console.log("Got new remote ICE candidate")
             await peerConnection.addIceCandidate(new RTCIceCandidate(data))
           }
         })
@@ -169,25 +182,25 @@ export const joinRoomById = async (roomId) => {
   })
 }
 
-export const hangUp = async (e) => {
+export const hangUp = async (isCreator) => {
   console.log("Hang up")
   const tracks = document.querySelector("#localVideo").srcObject.getTracks()
   tracks.forEach((track) => {
     track.stop()
   })
 
-  if (remoteStream) {
-    remoteStream.getTracks().forEach((track) => track.stop())
-  }
+  Object.keys(remoteStreams).forEach((key) => {
+    remoteStreams[key].getTracks().forEach((track) => track.stop())
+    document.querySelector(`#remoteVideo-${key}`).srcObject = null
+  })
 
   if (peerConnection) {
     peerConnection.close()
   }
 
   document.querySelector("#localVideo").srcObject = null
-  document.querySelector("#remoteVideo").srcObject = null
 
-  // Delete room on hangup
+  // Delete room on hangup (TODO: if isCreator)
   if (roomId) {
     const db = firebase.firestore()
     const roomRef = db.collection("rooms").doc(roomId)

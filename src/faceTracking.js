@@ -1,5 +1,5 @@
 import * as faceapi from "face-api.js"
-import { setStreams } from "./webRTC"
+import { setLocalStream } from "./webRTC"
 
 let canvasDimensions = {}
 
@@ -92,11 +92,6 @@ export const getFaceVideoFeed = () => {
     const localCanvas = document.querySelector("#localCanvas")
     const context = localCanvas.getContext("2d")
 
-    // This is the incoming video stream
-    const remoteStream = new MediaStream()
-    const remoteVideo = document.querySelector("#remoteVideo")
-    remoteVideo.srcObject = remoteStream
-
     localVideo.addEventListener(
       "play",
       () => {
@@ -117,7 +112,7 @@ export const getFaceVideoFeed = () => {
           .filter((t) => t.kind === "audio")[0]
         localStream.addTrack(audioTrack)
 
-        setStreams(localStream, remoteStream)
+        setLocalStream(localStream)
         resolve()
       },
       false

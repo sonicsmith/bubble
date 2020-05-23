@@ -33,7 +33,7 @@ if (window.location.search) {
 const toggleConnection = () => {
   const createBubbleButton = document.querySelector("#createBubbleButton")
   if (createBubbleButton.textContent === "highlight_off") {
-    hangUp()
+    webRTC.hangUp()
   } else {
     createBubble()
   }
