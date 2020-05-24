@@ -40,7 +40,7 @@ const toggleConnection = () => {
 }
 
 const showBubbleInfo = () => {
-  const bubbleLink = getBubbleLink()
+  const bubbleLink = webRTC.getBubbleLink()
   alert(bubbleLink)
 }
 
