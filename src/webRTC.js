@@ -30,11 +30,9 @@ export const getBubbleLink = () => {
 }
 
 const addRemoteTrack = (event) => {
-  //o=- 7348270952974862556 2 IN IP4 127.0.0.1
-  // const { sdp } = event.target.localDescription
-  // const id = sdp.split("\n")[0].substr(4, 19)
-  console.log(event)
-  const id = "1"
+  const { sdp } = event.srcElement.remoteDescription
+  const id = sdp.split("\n")[1].substr(4, 19)
+  console.log("New remote track, ID:", id)
   if (!remoteStreams[id]) {
     console.log("Creating new remote video element")
     const section = document.getElementById("videos")
@@ -182,7 +180,7 @@ export const joinRoomById = async (roomId) => {
   })
 }
 
-export const hangUp = async (isCreator) => {
+export const hangUp = async () => {
   console.log("Hang up")
   const tracks = document.querySelector("#localVideo").srcObject.getTracks()
   tracks.forEach((track) => {
@@ -200,8 +198,8 @@ export const hangUp = async (isCreator) => {
 
   document.querySelector("#localVideo").srcObject = null
 
-  // Delete room on hangup (TODO: if isCreator)
-  if (roomId) {
+  // Delete room on hangup if original creator // TODO: Yea?
+  if (roomId && !window.location.search) {
     const db = firebase.firestore()
     const roomRef = db.collection("rooms").doc(roomId)
     const calleeCandidates = await roomRef.collection("calleeCandidates").get()

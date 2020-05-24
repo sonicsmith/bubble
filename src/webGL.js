@@ -111,12 +111,11 @@ export const addAvatar = (videoId) => {
       repositionAvatars(avatars)
 
       scene.add(avatar)
+      console.log("Avatar added")
     },
     undefined,
     console.error
   )
-
-  console.log("Avatar added")
 }
 
 let lastOffset
