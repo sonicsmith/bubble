@@ -1,11 +1,16 @@
+import firebase from "firebase/app"
+import firebaseConfig from "./../firebaseConfig.json"
+import * as auth from "./auth"
 import * as webGL from "./webGL"
 import * as webRTC from "./webRTC"
 import * as faceTracking from "./faceTracking"
 import * as ui from "./ui"
 
+firebase.initializeApp(firebaseConfig)
+
 webGL.initialiseThreeJS()
-webRTC.initializeFirebase()
 faceTracking.initialiseFaceTracking()
+auth.initialiseSignIn()
 
 const createBubble = async () => {
   ui.setStatusText("Creating bubble...")

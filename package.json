@@ -19,7 +19,8 @@
   "dependencies": {
     "@material/top-app-bar": "^6.0.0",
     "face-api.js": "^0.22.2",
-    "firebase": "^7.14.2",
+    "firebase": "^7.14.5",
+    "firebaseui": "^4.5.0",
     "simple-peer": "^9.7.0",
     "three": "^0.115.0"
   }

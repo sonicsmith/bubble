@@ -3,6 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="stylesheet" type="text/css" href="./styles.css" />
+    <!-- MATERIAL UI -->
     <link
       rel="stylesheet"
       href="https://fonts.googleapis.com/icon?family=Material+Icons"
@@ -12,8 +13,28 @@
       rel="stylesheet"
     />
     <script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
+    <!-- FIREBASE AUTH UI -->
+    <link
+      type="text/css"
+      rel="stylesheet"
+      href="https://www.gstatic.com/firebasejs/ui/4.5.0/firebase-ui-auth.css"
+    />
   </head>
   <body>
+    <div
+      id="auth-container"
+      style="position: absolute; z-index: 10; left: 50%; top: 50%;"
+    ></div>
+    <div
+      id="loginBlock"
+      style="
+        position: absolute;
+        z-index: 5;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+      "
+    ></div>
     <header class="mdc-top-app-bar" style="background-color: crimson;">
       <div class="mdc-top-app-bar__row">
         <section

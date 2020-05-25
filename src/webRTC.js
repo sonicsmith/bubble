@@ -1,6 +1,5 @@
 import firebase from "firebase/app"
 import "firebase/firestore"
-import firebaseConfig from "./../firebaseConfig.json"
 import { addAvatar } from "./webGL"
 
 const urls = ["stun:stun1.l.google.com:19302", "stun:stun2.l.google.com:19302"]
@@ -15,9 +14,9 @@ let remoteStreams = {}
 let roomId = null
 let bubbleLink = null
 
-export const initializeFirebase = () => {
-  firebase.initializeApp(firebaseConfig)
-}
+// export const initializeFirebase = () => {
+//   firebase.initializeApp(firebaseConfig)
+// }
 
 // Here we set the webcam stream to local, and create a new remote stream
 // linked to our remote video
