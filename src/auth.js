@@ -9,10 +9,11 @@ const uiConfig = {
 
 export const initialiseSignIn = () => {
   firebase.auth().onAuthStateChanged((user) => {
-    ui.setLoggedIn(!!user)
     if (user) {
-      console.log("Logged in", user)
+      console.log("Logged in")
+      ui.setLoggedIn(user)
     } else {
+      ui.setLoggedIn(false)
       const ui = new firebaseui.auth.AuthUI(firebase.auth())
       ui.start("#auth-container", uiConfig)
     }

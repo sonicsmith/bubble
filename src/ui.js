@@ -8,9 +8,13 @@ export const setBubbleIsConnected = (isConnected) => {
     : "add"
 }
 
-export const setLoggedIn = (isLoggedIn) => {
-  document.querySelector("#createBubbleButton").disabled = !isLoggedIn
-  if (isLoggedIn) {
+export const setLoggedIn = (user) => {
+  if (user) {
     document.querySelector("#loginBlock").remove()
+    const { displayName, photoURL } = user
+    document.querySelector("#profileImage").src = photoURL
+    console.log(displayName, "Logged in")
+  } else {
+    //
   }
 }
